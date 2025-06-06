@@ -21,28 +21,29 @@ const Header = () => {
   }
 
   return (
-    <header className="bg-gray-800 shadow-md py-4 px-6 flex justify-between items-center">
-      <h1 className="text-2xl font-bold text-blue-400">ChatPDF</h1>
+    <header className="backdrop-blur-md bg-white/5 border-b border-white/10 shadow-2xl py-4 px-6 flex justify-between items-center">
+      <h1 className="text-2xl font-bold text-white drop-shadow-lg">ChatPDF</h1>
+      <h1 className="text-2xl font-bold text-white drop-shadow-lg">Hi, {userName}!</h1>
       
       <Sheet>
         <SheetTrigger asChild>
-          <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold cursor-pointer hover:bg-blue-700 transition-colors">
+          <div className="w-10 h-10 rounded-full backdrop-blur-md bg-white/10 border border-white/20 flex items-center justify-center text-white font-bold cursor-pointer hover:bg-white/20 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
             {userName?.[0]?.toUpperCase() || '?'}
           </div>
         </SheetTrigger>
         
-        <SheetContent side="right" className="bg-gray-800 border-l border-gray-700 text-white">
-              <SheetTitle className="sr-only"></SheetTitle>
+        <SheetContent side="right" className="backdrop-blur-md bg-black/80 border-l border-white/10 text-white shadow-2xl">
+          <SheetTitle className="sr-only"></SheetTitle>
 
           <div className="flex flex-col h-full">
-            <div className="px-4 py-6 border-b border-gray-700">
-              <div className="text-xl font-semibold">{userName}</div>
-              <div className="text-sm text-gray-400 mt-1">{email}</div>
+            <div className="px-4 py-6 border-b border-white/10">
+              <div className="text-xl font-semibold text-white drop-shadow-md">{userName}</div>
+              <div className="text-sm text-white/70 mt-1">{email}</div>
             </div>
             
             <div className="flex-1 flex flex-col py-4">
               <button 
-                className="px-4 py-3 text-left hover:bg-gray-700 transition-colors text-green-400"
+                className="px-4 py-3 text-left backdrop-blur-md bg-white/5 hover:bg-white/10 transition-all duration-300 text-white border border-white/10 rounded-lg mx-2 mb-2 hover:scale-102 shadow-md"
                 onClick={() => {
                   navigate('/auth/setpassword')
                 }}
@@ -50,7 +51,7 @@ const Header = () => {
                 Change password
               </button>
               <button 
-                className="px-4 py-3 text-left hover:bg-gray-700 transition-colors text-red-400"
+                className="px-4 py-3 text-left backdrop-blur-md bg-white/5 hover:bg-white/10 transition-all duration-300 text-white/90 hover:text-white border border-white/10 rounded-lg mx-2 hover:scale-102 shadow-md"
                 onClick={handleLogout}
               >
                 Logout

@@ -33,7 +33,7 @@ const App = () => {
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
-        <Toaster richColors position="top-right" />
+        <Toaster richColors position="bottom-right" />
 
     </div>
   );

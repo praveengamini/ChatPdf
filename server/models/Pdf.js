@@ -1,21 +1,12 @@
-// models/PDF.js
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const pdfSchema = new mongoose.Schema({
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
-    pdfurl: {
-        type: String, 
-        required: true
-    },
-    uploadedAt: {
-        type: Date,
-        default: Date.now
-    }
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  fileName: { type: String, required: true },
+  fileUrl: { type: String, required: true }, // S3 or local server URL
+  parsedText: { type: String, required: true }, // Only parsed once
+  createdAt: { type: Date, default: Date.now }
 });
 
 const PDF = mongoose.model('PDF', pdfSchema);
-export default PDF;
+module.exports = PDF;
