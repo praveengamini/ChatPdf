@@ -94,55 +94,68 @@ const Home = () => {
     }
   }
 
-  const handleSendMessage = async () => {
-    if (query.trim() === '') return
+ const handleSendMessage = async () => {
+  if (query.trim() === '') return
 
-    const userMessage = {
-      text: query,
-      sender: 'user',
-      timestamp: new Date().toLocaleTimeString()
-    }
-
-    // Add user message immediately
-    setMessages(prevMessages => [...prevMessages, userMessage])
-    const currentQuery = query
-    setQuery('')
-    setIsLoading(true)
-
-    try {
-      const resultAction = await dispatch(sendMessageToChat({
-        pdfId,
-        userId: user.id,
-        message: currentQuery
-      }))
-      
-      if (sendMessageToChat.fulfilled.match(resultAction)) {
-        const updatedChat = resultAction.payload.chat
-        const aiMessageObj = updatedChat.messages[updatedChat.messages.length - 1]
-
-        const aiMessage = {
-          text: aiMessageObj.message,
-          sender: aiMessageObj.sender,
-          timestamp: aiMessageObj.timestamp || new Date().toLocaleTimeString()
-        }
-
-        setMessages(prevMessages => [...prevMessages, aiMessage])
-      } else {
-        throw new Error(resultAction.payload?.message || 'Message failed to send.')
-      }
-    } catch (error) {
-      console.error('Error getting response:', error)
-      
-      setMessages(prevMessages => [...prevMessages, {
-        text: "Error: Failed to get response from server.",
-        sender: 'system',
-        timestamp: new Date().toLocaleTimeString()
-      }])
-    } finally {
-      setIsLoading(false)
-      scrollToBottom()
-    }
+  const userMessage = {
+    text: query,
+    sender: 'user',
+    timestamp: new Date().toLocaleTimeString()
   }
+
+  // Add user message immediately
+  setMessages(prevMessages => [...prevMessages, userMessage])
+  const currentQuery = query
+  setQuery('')
+  setIsLoading(true)
+
+  try {
+    // Fix: Properly extract the pdfId string
+    let pdfIdToSend = pdfId;
+    
+    // If pdfId is an object, extract the _id or id property
+    if (typeof pdfId === 'object' && pdfId !== null) {
+      pdfIdToSend = pdfId._id || pdfId.id || pdfId;
+    }
+    
+    // Ensure it's a string
+    pdfIdToSend = String(pdfIdToSend);
+    
+    console.log('Sending pdfId:', pdfIdToSend); // Debug log
+    
+    const resultAction = await dispatch(sendMessageToChat({
+      pdfId: pdfIdToSend,
+      userId: user.id,
+      message: currentQuery
+    }))
+    
+    if (sendMessageToChat.fulfilled.match(resultAction)) {
+      const updatedChat = resultAction.payload.chat
+      const aiMessageObj = updatedChat.messages[updatedChat.messages.length - 1]
+
+      const aiMessage = {
+        text: aiMessageObj.message,
+        sender: aiMessageObj.sender,
+        timestamp: aiMessageObj.timestamp || new Date().toLocaleTimeString()
+      }
+
+      setMessages(prevMessages => [...prevMessages, aiMessage])
+    } else {
+      throw new Error(resultAction.payload?.message || 'Message failed to send.')
+    }
+  } catch (error) {
+    console.error('Error getting response:', error)
+    
+    setMessages(prevMessages => [...prevMessages, {
+      text: "Error: Failed to get response from server.",
+      sender: 'system',
+      timestamp: new Date().toLocaleTimeString()
+    }])
+  } finally {
+    setIsLoading(false)
+    scrollToBottom()
+  }
+}
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -156,11 +169,16 @@ const Home = () => {
   }
 
   // Callback when a document is selected from sidebar
-  const handleDocumentSelect = (pdf) => {
-    setCurrentPdfName(pdf.fileName)
-    setPdfUploaded(true)
-    // Messages will be updated through useEffect when Redux state changes
+const handleDocumentSelect = (pdf) => {
+  if (!pdf || !pdf.pdfId) {
+    console.error("No PDF ID provided")
+    return
   }
+  
+  setCurrentPdfName(pdf.fileName)
+  setPdfUploaded(true)
+  // No need to do anything else as Redux already has the chat and pdfId
+}
 
   // Callback when new chat is clicked
   const handleNewChat = () => {

@@ -160,12 +160,13 @@ const pdfChatSlice = createSlice({
         state.loading = true
         state.error = null
       })
-      .addCase(getChatByPdf.fulfilled, (state, action) => {
-        state.loading = false
-        state.chat = action.payload.chat?.messages || []
-        state.pdfId = action.payload.chat?.pdfId || null
-        state.error = null
-      })
+     .addCase(getChatByPdf.fulfilled, (state, action) => {
+      state.loading = false
+      state.chat = action.payload.chat?.messages || []
+      // Make sure to set the pdfId from the response
+      state.pdfId = action.payload.chat?.pdfId || null
+      state.error = null
+    })
       .addCase(getChatByPdf.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload

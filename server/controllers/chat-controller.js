@@ -27,41 +27,44 @@ const addMessageToChat = async (req, res) => {
     const { pdfId, userId } = req.params;
     const { sender, message } = req.body;
 
-    // Validate parameters
-    if (!pdfId || !userId) {
+    if (!pdfId || !userId || !sender || !message) {
       return res.status(400).json({
         success: false,
-        message: 'Missing pdfId or userId'
+        message: 'Missing required fields: pdfId, userId, sender, or message'
       });
     }
 
-    // 1. Find or create a chat
+    // Generate sessionId (you can customize how it's generated or passed from frontend)
+    const sessionId = userId; // Or use `${userId}_${pdfId}` if you want to separate per PDF
+
+    // 1. Find or create chat in DB
     let chat = await Chat.findOne({ pdfId, userId });
     if (!chat) {
       chat = new Chat({ pdfId, userId, messages: [] });
     }
 
-    // 2. Add user's message
+    // 2. Save user's message
     chat.messages.push({ sender, message });
     await chat.save();
 
-    console.log('Calling Python service with:', { pdfId, message });
+    // 3. Call Python API with message, pdfId, and sessionId
+    console.log('Calling Python service with:', { pdfId, message, sessionId });
 
-    // 3. Send user message and PDF ID to Python microservice
     const aiResponse = await axios.post('http://192.168.31.96:8000/api/generate', {
       pdfId,
-      message
+      message,
+      sessionId
     });
-    
+
     console.log("Python AI response:", aiResponse.data);
 
     const aiMessage = aiResponse.data.answer || 'Sorry, I could not generate a response.';
 
-    // 4. Save AI's reply
+    // 4. Save AI's response
     chat.messages.push({ sender: 'ai', message: aiMessage });
     await chat.save();
 
-    // 5. Respond to frontend with updated chat
+    // 5. Return updated chat
     res.status(201).json({
       success: true,
       chat
@@ -73,14 +76,15 @@ const addMessageToChat = async (req, res) => {
     console.error('Error response:', err.response?.data);
     console.error('Full error:', err);
     console.error('==================');
-    
+
     res.status(500).json({
       success: false,
       message: 'Failed to process chat message',
-      error: err.message // Add this for debugging
+      error: err.message
     });
   }
 };
+
 
 
 module.exports = {getChatByPdf,addMessageToChat}

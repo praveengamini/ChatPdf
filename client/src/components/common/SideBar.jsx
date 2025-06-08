@@ -49,19 +49,26 @@ const SideBar = ({ searchDialogOpen, setSearchDialogOpen, onDocumentSelect, onNe
     }
   }
 
-  const handleDocumentClick = async (pdf) => {
-    try {
-      setSelectedPdfId(pdf._id)
-      // Dispatch getChatByPdf to load existing chat
-      await dispatch(getChatByPdf(pdf._id)).unwrap()
+const handleDocumentClick = async (pdf) => {
+  try {
+    setSelectedPdfId(pdf._id)
+    // First dispatch getChatByPdf to load existing chat
+    const result = await dispatch(getChatByPdf(pdf._id)).unwrap()
+    
+    // Make sure the result contains the pdfId
+    if (result.chat?.pdfId) {
       // Call the callback to update Home component
       if (onDocumentSelect) {
-        onDocumentSelect(pdf)
+        onDocumentSelect({
+          fileName: pdf.fileName,
+          pdfId: result.chat.pdfId // Make sure to pass the pdfId
+        })
       }
-    } catch (error) {
-      console.error('Failed to load chat:', error)
     }
+  } catch (error) {
+    console.error('Failed to load chat:', error)
   }
+}
 
   const handleNewChat = () => {
     dispatch(resetPdfChat())
