@@ -1,8 +1,6 @@
-// redux/pdfChatSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axios from 'axios'
 
-// Async thunk to upload PDF
 export const uploadPdf = createAsyncThunk(
   'pdfChat/uploadPdf',
   async ({ file, userId }, thunkAPI) => {
@@ -21,7 +19,6 @@ export const uploadPdf = createAsyncThunk(
     }
   }
 )
-// Async thunk to send message
 export const sendMessageToChat = createAsyncThunk(
   'pdfChat/sendMessageToChat',
   async ({ pdfId, userId, message }, thunkAPI) => {
@@ -37,7 +34,6 @@ export const sendMessageToChat = createAsyncThunk(
   }
 )
 
-// Async thunk to get user PDFs
 export const getUserPdfs = createAsyncThunk(
   'pdfChat/getUserPdfs',
   async (userId, { rejectWithValue }) => {
@@ -93,7 +89,6 @@ const pdfChatSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // PDF Upload
       .addCase(uploadPdf.pending, (state) => {
         state.loading = true
       })
@@ -110,7 +105,6 @@ const pdfChatSlice = createSlice({
         state.error = action.payload.message
       })
 
-      // Sending chat message
       .addCase(sendMessageToChat.pending, (state) => {
         state.loading = true
       })
@@ -123,13 +117,11 @@ const pdfChatSlice = createSlice({
         state.error = action.payload.message
       })
 
-      // Get user PDFs
       .addCase(getUserPdfs.pending, (state) => {
         state.loading = true
         state.error = null
       })
       .addCase(getUserPdfs.fulfilled, (state, action) => {
-        console.log('getUserPdfs fulfilled:', action.payload)
         state.loading = false
         state.userPdfs = action.payload.data || []
         state.error = null
@@ -144,9 +136,7 @@ const pdfChatSlice = createSlice({
       })
       .addCase(deletePdf.fulfilled, (state, action) => {
         state.loading = false
-        // Remove the deleted PDF from userPdfs array
         state.userPdfs = state.userPdfs.filter(pdf => pdf._id !== action.payload.pdfId)
-        // If the deleted PDF was the current one, reset the chat
         if (state.pdfId === action.payload.pdfId) {
           state.pdfId = null
           state.chat = []
@@ -163,7 +153,6 @@ const pdfChatSlice = createSlice({
      .addCase(getChatByPdf.fulfilled, (state, action) => {
       state.loading = false
       state.chat = action.payload.chat?.messages || []
-      // Make sure to set the pdfId from the response
       state.pdfId = action.payload.chat?.pdfId || null
       state.error = null
     })

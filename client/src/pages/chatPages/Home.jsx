@@ -29,7 +29,6 @@ const Home = () => {
   const [searchDialogOpen, setSearchDialogOpen] = useState(false)
   const user = useSelector(state => state.auth.user)
 
-  // Convert Redux chat messages to component format
   const convertReduxChatToMessages = (reduxChat) => {
     return reduxChat.map(msg => ({
       text: msg.message,
@@ -38,7 +37,6 @@ const Home = () => {
     }))
   }
 
-  // Update messages when Redux chat changes
   useEffect(() => {
     if (chatFromRedux && chatFromRedux.length > 0) {
       const convertedMessages = convertReduxChatToMessages(chatFromRedux)
@@ -48,7 +46,6 @@ const Home = () => {
     }
   }, [chatFromRedux])
 
-  // Update PDF uploaded state when pdfId changes
   useEffect(() => {
     if (pdfId) {
       setPdfUploaded(true)
@@ -94,68 +91,60 @@ const Home = () => {
     }
   }
 
- const handleSendMessage = async () => {
-  if (query.trim() === '') return
+  const handleSendMessage = async () => {
+    if (query.trim() === '') return
 
-  const userMessage = {
-    text: query,
-    sender: 'user',
-    timestamp: new Date().toLocaleTimeString()
-  }
-
-  // Add user message immediately
-  setMessages(prevMessages => [...prevMessages, userMessage])
-  const currentQuery = query
-  setQuery('')
-  setIsLoading(true)
-
-  try {
-    // Fix: Properly extract the pdfId string
-    let pdfIdToSend = pdfId;
-    
-    // If pdfId is an object, extract the _id or id property
-    if (typeof pdfId === 'object' && pdfId !== null) {
-      pdfIdToSend = pdfId._id || pdfId.id || pdfId;
-    }
-    
-    // Ensure it's a string
-    pdfIdToSend = String(pdfIdToSend);
-    
-    console.log('Sending pdfId:', pdfIdToSend); // Debug log
-    
-    const resultAction = await dispatch(sendMessageToChat({
-      pdfId: pdfIdToSend,
-      userId: user.id,
-      message: currentQuery
-    }))
-    
-    if (sendMessageToChat.fulfilled.match(resultAction)) {
-      const updatedChat = resultAction.payload.chat
-      const aiMessageObj = updatedChat.messages[updatedChat.messages.length - 1]
-
-      const aiMessage = {
-        text: aiMessageObj.message,
-        sender: aiMessageObj.sender,
-        timestamp: aiMessageObj.timestamp || new Date().toLocaleTimeString()
-      }
-
-      setMessages(prevMessages => [...prevMessages, aiMessage])
-    } else {
-      throw new Error(resultAction.payload?.message || 'Message failed to send.')
-    }
-  } catch (error) {
-    console.error('Error getting response:', error)
-    
-    setMessages(prevMessages => [...prevMessages, {
-      text: "Error: Failed to get response from server.",
-      sender: 'system',
+    const userMessage = {
+      text: query,
+      sender: 'user',
       timestamp: new Date().toLocaleTimeString()
-    }])
-  } finally {
-    setIsLoading(false)
-    scrollToBottom()
+    }
+
+    setMessages(prevMessages => [...prevMessages, userMessage])
+    const currentQuery = query
+    setQuery('')
+    setIsLoading(true)
+
+    try {
+      let pdfIdToSend = pdfId
+      if (typeof pdfId === 'object' && pdfId !== null) {
+        pdfIdToSend = pdfId._id || pdfId.id || pdfId
+      }
+      pdfIdToSend = String(pdfIdToSend)
+      
+      const resultAction = await dispatch(sendMessageToChat({
+        pdfId: pdfIdToSend,
+        userId: user.id,
+        message: currentQuery
+      }))
+      
+      if (sendMessageToChat.fulfilled.match(resultAction)) {
+        const updatedChat = resultAction.payload.chat
+        const aiMessageObj = updatedChat.messages[updatedChat.messages.length - 1]
+
+        const aiMessage = {
+          text: aiMessageObj.message,
+          sender: aiMessageObj.sender,
+          timestamp: aiMessageObj.timestamp || new Date().toLocaleTimeString()
+        }
+
+        setMessages(prevMessages => [...prevMessages, aiMessage])
+      } else {
+        throw new Error(resultAction.payload?.message || 'Message failed to send.')
+      }
+    } catch (error) {
+      console.error('Error getting response:', error)
+      
+      setMessages(prevMessages => [...prevMessages, {
+        text: "Error: Failed to get response from server.",
+        sender: 'system',
+        timestamp: new Date().toLocaleTimeString()
+      }])
+    } finally {
+      setIsLoading(false)
+      scrollToBottom()
+    }
   }
-}
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -168,19 +157,16 @@ const Home = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
-  // Callback when a document is selected from sidebar
-const handleDocumentSelect = (pdf) => {
-  if (!pdf || !pdf.pdfId) {
-    console.error("No PDF ID provided")
-    return
+  const handleDocumentSelect = (pdf) => {
+    if (!pdf || !pdf.pdfId) {
+      console.error("No PDF ID provided")
+      return
+    }
+    
+    setCurrentPdfName(pdf.fileName)
+    setPdfUploaded(true)
   }
-  
-  setCurrentPdfName(pdf.fileName)
-  setPdfUploaded(true)
-  // No need to do anything else as Redux already has the chat and pdfId
-}
 
-  // Callback when new chat is clicked
   const handleNewChat = () => {
     setPdfUploaded(false)
     setMessages([])
@@ -190,7 +176,6 @@ const handleDocumentSelect = (pdf) => {
     setPdfUploadFailed(false)
   }
 
-  // Effect to scroll to bottom when messages update
   useEffect(() => {
     scrollToBottom()
   }, [messages])
@@ -210,17 +195,12 @@ const handleDocumentSelect = (pdf) => {
             {!pdfUploaded ? (
               <div className="h-full flex flex-col items-center justify-center text-center p-8">
                 <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl p-12 shadow-2xl">
-                  
-                  {/* Loading Animation during PDF Upload */}
                   {isUploadingPdf ? (
                     <div className="flex flex-col items-center">
-                      {/* Spinning PDF Icon */}
                       <div className="relative mb-6">
                         <BsFilePdf className="text-6xl text-white animate-pulse" />
                         <div className="absolute inset-0 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
                       </div>
-                      
-                      {/* Loading Text with Animation */}
                       <h2 className="text-2xl font-bold text-white mb-4">
                         Uploading PDF
                         <span className="animate-pulse">
@@ -229,16 +209,12 @@ const handleDocumentSelect = (pdf) => {
                           <span className="animate-bounce inline-block mx-1" style={{animationDelay: '0.2s'}}>.</span>
                         </span>
                       </h2>
-                      
-                      {/* Progress Bar Animation */}
                       <div className="w-64 h-2 bg-white/20 rounded-full overflow-hidden mb-4">
                         <div className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
                       </div>
-                      
                       <p className="text-white/70 text-sm">Please wait while we process your document...</p>
                     </div>
                   ) : (
-                    // Normal Upload UI
                     <>
                       <BsFilePdf className="text-6xl text-white mb-6 mx-auto drop-shadow-lg" />
                       <h2 className="text-3xl font-bold text-white mb-4 drop-shadow-lg">Upload a PDF to start chatting</h2>
@@ -260,7 +236,6 @@ const handleDocumentSelect = (pdf) => {
               </div>
             ) : (
               <>
-                {/* Document Header */}
                 {currentPdfName && (
                   <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-xl p-4 mb-4 shadow-lg">
                     <div className="flex items-center gap-3">
@@ -272,8 +247,6 @@ const handleDocumentSelect = (pdf) => {
                     </div>
                   </div>
                 )}
-
-                {/* Messages */}
                 {messages.map((message, index) => (
                   <div 
                     key={index} 
@@ -287,8 +260,6 @@ const handleDocumentSelect = (pdf) => {
                     >
                       <p className="leading-relaxed whitespace-pre-line">{message.text}</p>
                       <p className="text-xs mt-2 text-white/50">{message.timestamp}</p>
-                      
-                      {/* Retry Button */}
                       {pdfUploadFailed && message.text.startsWith('Failed to upload PDF') && (
                         <button
                           onClick={() => handleFileUpload({ target: { files: [pdfFile] } })}
@@ -301,7 +272,6 @@ const handleDocumentSelect = (pdf) => {
                     </div>
                   </div>
                 ))}
-
                 {isLoading && (
                   <div className="text-white/50 text-sm italic text-center animate-pulse">
                     Thinking...
@@ -311,8 +281,6 @@ const handleDocumentSelect = (pdf) => {
               </>
             )}
           </div>
-
-          {/* Input area */}
           {pdfUploaded && (
             <div className="sticky bottom-0 backdrop-blur-md bg-white/5 border border-white/10 p-6 rounded-2xl shadow-2xl">
               <div className="flex items-end gap-4">

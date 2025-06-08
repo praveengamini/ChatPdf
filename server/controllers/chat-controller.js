@@ -1,6 +1,6 @@
-// controllers/chatController.js
 const Chat = require('../models/Chats.js');
-const axios = require('axios')
+const axios = require('axios');
+
 const getChatByPdf = async (req, res) => {
   try {
     const { pdfId } = req.params;
@@ -16,14 +16,6 @@ const getChatByPdf = async (req, res) => {
 
 const addMessageToChat = async (req, res) => {
   try {
-    console.log('=== CHAT REQUEST DEBUG ===');
-    console.log('URL:', req.url);
-    console.log('Route params:', req.params);
-    console.log('Request body:', req.body);
-    console.log('pdfId:', req.params.pdfId);
-    console.log('userId:', req.params.userId);
-    console.log('========================');
-
     const { pdfId, userId } = req.params;
     const { sender, message } = req.body;
 
@@ -34,21 +26,15 @@ const addMessageToChat = async (req, res) => {
       });
     }
 
-    // Generate sessionId (you can customize how it's generated or passed from frontend)
-    const sessionId = userId; // Or use `${userId}_${pdfId}` if you want to separate per PDF
+    const sessionId = userId;
 
-    // 1. Find or create chat in DB
     let chat = await Chat.findOne({ pdfId, userId });
     if (!chat) {
       chat = new Chat({ pdfId, userId, messages: [] });
     }
 
-    // 2. Save user's message
     chat.messages.push({ sender, message });
     await chat.save();
-
-    // 3. Call Python API with message, pdfId, and sessionId
-    console.log('Calling Python service with:', { pdfId, message, sessionId });
 
     const aiResponse = await axios.post('http://192.168.31.96:8000/api/generate', {
       pdfId,
@@ -56,27 +42,17 @@ const addMessageToChat = async (req, res) => {
       sessionId
     });
 
-    console.log("Python AI response:", aiResponse.data);
-
     const aiMessage = aiResponse.data.answer || 'Sorry, I could not generate a response.';
 
-    // 4. Save AI's response
     chat.messages.push({ sender: 'ai', message: aiMessage });
     await chat.save();
 
-    // 5. Return updated chat
     res.status(201).json({
       success: true,
       chat
     });
 
   } catch (err) {
-    console.error('=== CHAT ERROR ===');
-    console.error('Error message:', err.message);
-    console.error('Error response:', err.response?.data);
-    console.error('Full error:', err);
-    console.error('==================');
-
     res.status(500).json({
       success: false,
       message: 'Failed to process chat message',
@@ -85,6 +61,4 @@ const addMessageToChat = async (req, res) => {
   }
 };
 
-
-
-module.exports = {getChatByPdf,addMessageToChat}
+module.exports = { getChatByPdf, addMessageToChat };

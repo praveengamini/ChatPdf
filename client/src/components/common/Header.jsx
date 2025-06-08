@@ -22,7 +22,7 @@ const Header = () => {
 
   return (
     <header className="backdrop-blur-md bg-white/5 border-b border-white/10 shadow-2xl py-4 px-6 flex justify-between items-center">
-      <h1 className="text-2xl font-bold text-white drop-shadow-lg">ChatPDF</h1>
+      <h1 className="text-2xl font-bold text-white drop-shadow-lg max-lg:invisible ">ChatPDF</h1>
       <h1 className="text-2xl font-bold text-white drop-shadow-lg">Hi, {userName}!</h1>
       
       <Sheet>

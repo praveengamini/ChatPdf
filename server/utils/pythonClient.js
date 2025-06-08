@@ -1,4 +1,3 @@
-// utils/pythonClient.js
 const axios = require('axios');
 
 const sendToPythonMicroservice = async ({ text, pdfId }) => {

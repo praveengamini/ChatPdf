@@ -1,4 +1,3 @@
-// Add these utility functions to your pdfChatSlice.js
 export const saveCurrentPdfToStorage = (pdfId) => {
   try {
     localStorage.setItem('currentPdfId', pdfId);
