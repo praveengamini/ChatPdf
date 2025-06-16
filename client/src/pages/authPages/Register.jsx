@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Label } from '../../components/ui/label'
 import { Input } from '../../components/ui/input'
 import { useNavigate } from 'react-router-dom'
-import { FaUser, FaEnvelope, FaLock, FaArrowRight } from 'react-icons/fa'
+import { FaUser, FaEnvelope, FaLock, FaArrowRight, FaEye, FaEyeSlash } from 'react-icons/fa'
 import { useDispatch } from 'react-redux';
 import { toast } from 'sonner';
 import { register } from '../../store/auth'
@@ -13,6 +13,7 @@ const Register = () => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [name, setName] = useState("")
+    const [showPassword, setShowPassword] = useState(false)
     const dispatch = useDispatch()
 
    async function handleRegister(event) {
@@ -39,6 +40,10 @@ const Register = () => {
         {
              toast.error("An unexpected error occurred");
         }
+    }
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword)
     }
 
     return (
@@ -84,15 +89,24 @@ const Register = () => {
                         <Label htmlFor="password" className="text-white/90 flex items-center gap-2">
                             <FaLock className="text-white" /> Password
                         </Label>
-                        <Input
-                            type="password"
-                            id="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="bg-white/3 backdrop-blur-xl border-white/40 text-white placeholder:text-white/60 focus:ring-2 focus:ring-white/60 focus:border-white/60 backdrop-saturate-150"
-                            placeholder="••••••••"
-                            required
-                        />
+                        <div className="relative">
+                            <Input
+                                type={showPassword ? "text" : "password"}
+                                id="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="bg-white/3 backdrop-blur-xl border-white/40 text-white placeholder:text-white/60 focus:ring-2 focus:ring-white/60 focus:border-white/60 backdrop-saturate-150 pr-12"
+                                placeholder="enter your password"
+                                required
+                            />
+                            <button
+                                type="button"
+                                onClick={togglePasswordVisibility}
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/70 hover:text-white transition-colors focus:outline-none"
+                            >
+                                {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+                            </button>
+                        </div>
                     </div>
 
                     <button

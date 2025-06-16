@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Label } from '../../components/ui/label'
 import { Input } from '../../components/ui/input'
-import { FaEnvelope, FaLock, FaKey, FaSave } from 'react-icons/fa'
+import { FaEnvelope, FaLock, FaKey, FaSave, FaEye, FaEyeSlash } from 'react-icons/fa'
 import { useSelector } from 'react-redux'
 import { useDispatch } from 'react-redux'
 import { changePassword } from '../../store/auth'
@@ -11,6 +11,8 @@ import { toast } from 'sonner'
 const SetPassword = () => {
     const [oldPassword, setOldPassword] = useState("")
     const [newPassword, setNewPassword] = useState("")
+    const [showOldPassword, setShowOldPassword] = useState(false)
+    const [showNewPassword, setShowNewPassword] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const [message, setMessage] = useState('')
     const navigate = useNavigate()
@@ -51,6 +53,14 @@ const SetPassword = () => {
         }
     }
 
+    const toggleOldPasswordVisibility = () => {
+        setShowOldPassword(!showOldPassword)
+    }
+
+    const toggleNewPasswordVisibility = () => {
+        setShowNewPassword(!showNewPassword)
+    }
+
     return (
         <div className="min-h-screen bg-black flex items-center justify-center p-4">
             <div className="w-full max-w-md bg-white/5 backdrop-blur-3xl rounded-xl shadow-2xl overflow-hidden border border-white/30 backdrop-saturate-150">
@@ -78,30 +88,47 @@ const SetPassword = () => {
                         <Label htmlFor="oldPassword" className="text-white/90 flex items-center gap-2">
                             <FaLock className="text-white" /> Current Password
                         </Label>
-                        <Input
-                            type="password"
-                            id="oldPassword"
-                            value={oldPassword}
-                            onChange={(e) => setOldPassword(e.target.value)}
-                            className="bg-white/3 backdrop-blur-xl border-white/40 text-white placeholder:text-white/60 focus:ring-2 focus:ring-white/60 focus:border-white/60 backdrop-saturate-150"
-                            placeholder="••••••••"
-                            required
-                        />
+                        <div className="relative">
+                            <Input
+                                type={showOldPassword ? "text" : "password"}
+                                id="oldPassword"
+                                value={oldPassword}
+                                onChange={(e) => setOldPassword(e.target.value)}
+                                className="bg-white/3 backdrop-blur-xl border-white/40 text-white placeholder:text-white/60 focus:ring-2 focus:ring-white/60 focus:border-white/60 backdrop-saturate-150 pr-12"
+                            
+                                required
+                            />
+                            <button
+                                type="button"
+                                onClick={toggleOldPasswordVisibility}
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/70 hover:text-white transition-colors focus:outline-none"
+                            >
+                                {showOldPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+                            </button>
+                        </div>
                     </div>
 
                     <div className="space-y-2">
                         <Label htmlFor="newPassword" className="text-white/90 flex items-center gap-2">
                             <FaKey className="text-white" /> New Password
                         </Label>
-                        <Input
-                            type="password"
-                            id="newPassword"
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                            className="bg-white/3 backdrop-blur-xl border-white/40 text-white placeholder:text-white/60 focus:ring-2 focus:ring-white/60 focus:border-white/60 backdrop-saturate-150"
-                            placeholder="••••••••"
-                            required
-                        />
+                        <div className="relative">
+                            <Input
+                                type={showNewPassword ? "text" : "password"}
+                                id="newPassword"
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                                className="bg-white/3 backdrop-blur-xl border-white/40 text-white placeholder:text-white/60 focus:ring-2 focus:ring-white/60 focus:border-white/60 backdrop-saturate-150 pr-12"
+                                required
+                            />
+                            <button
+                                type="button"
+                                onClick={toggleNewPasswordVisibility}
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/70 hover:text-white transition-colors focus:outline-none"
+                            >
+                                {showNewPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+                            </button>
+                        </div>
                     </div>
 
                     <button
