@@ -64,6 +64,8 @@ export const changePassword = createAsyncThunk(
     '/auth/changePassword',
     async(formData)=>{
         const response = await axios.post('http://localhost:5000/api/auth/setnewpassword',formData)
+        console.log(response.data.payload);
+        
         return response.data
     }
 )
@@ -105,7 +107,7 @@ const authSlice = createSlice({
         state.isLoading = false;
       })
       .addCase(register.fulfilled, (state, action) => {
-        state.isAuthenticated = true;
+        state.isAuthenticated = false;
         state.user = action.payload.user;
         state.isLoading = false;
       })
