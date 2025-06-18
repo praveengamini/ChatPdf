@@ -36,7 +36,7 @@ const addMessageToChat = async (req, res) => {
     chat.messages.push({ sender, message });
     await chat.save();
 
-    const aiResponse = await axios.post('http://192.168.31.96:8000/api/generate', {
+    const aiResponse = await axios.post(`${process.env.IP_PY_MICRO}/api/generate`, {
       pdfId,
       message,
       sessionId

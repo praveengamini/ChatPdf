@@ -2,7 +2,7 @@ const axios = require('axios');
 
 const sendToPythonMicroservice = async ({ text, pdfId }) => {
   try {
-    const response = await axios.post('http://192.168.31.96:8000/embed', {
+    const response = await axios.post(`${process.env.IP_PY_MICRO}/embed`, {
       text,
       pdfId
     });
@@ -14,3 +14,4 @@ const sendToPythonMicroservice = async ({ text, pdfId }) => {
 };
 
 module.exports = {sendToPythonMicroservice}
+// process.env.IP_PY_MICRO
