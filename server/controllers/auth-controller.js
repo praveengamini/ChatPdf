@@ -182,6 +182,7 @@ const forgotPassword = async (req, res) => {
         return res.json({
           success: true,
           message: "OTP verified.Copy your new password is : "+generateNewPassword,
+          password:generateNewPassword
         });
       } else {
         return res.json({ success: false, message: "Incorrect OTP. Please try again." });

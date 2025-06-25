@@ -1,26 +1,27 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from 'axios'
+
 const initialData = {
-  user:null,
+  user: null,
   isAuthenticated: false,
   isLoading: false
 }
 
-export const register= createAsyncThunk(
-    '/auth/register',
-    async(formData)=>{
-        const respone = await axios.post("http://localhost:5000/api/auth/register",formData,{
-            withCredentials:true
-        })
-        
-        return respone.data
-    }   
-
+export const register = createAsyncThunk(
+  '/auth/register',
+  async (formData) => {
+    const response = await axios.post("http://localhost:5000/api/auth/register", formData, {
+      withCredentials: true
+    })
+    
+    return response.data
+  }   
 )
+
 export const login = createAsyncThunk(
   '/auth/login',
   async (formData) => {
-       const response = await axios.post(
+    const response = await axios.post(
       "http://localhost:5000/api/auth/login",
       formData,
       {
@@ -32,16 +33,21 @@ export const login = createAsyncThunk(
 );
 
 export const logoutUser = createAsyncThunk(
-    "/auth/logout",
-    async () => {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/logout", 
-        {},
-        { withCredentials: true }
-      );
-      return response.data;
-    }
-  );
+  "/auth/logout",
+  async (_, { dispatch }) => {
+    const response = await axios.post(
+      "http://localhost:5000/api/auth/logout", 
+      {},
+      { withCredentials: true }
+    );
+    
+    // Clear PDF chat data on logout
+    dispatch({ type: 'pdfChat/resetPdfChat' });
+    
+    return response.data;
+  }
+);
+
 export const checkAuthUser = createAsyncThunk(
   "/auth/checkauth",
   async () => {
@@ -61,29 +67,30 @@ export const checkAuthUser = createAsyncThunk(
 );
 
 export const changePassword = createAsyncThunk(
-    '/auth/changePassword',
-    async(formData)=>{
-        const response = await axios.post('http://localhost:5000/api/auth/setnewpassword',formData)
-        console.log(response.data.payload);
-        
-        return response.data
-    }
+  '/auth/changePassword',
+  async (formData) => {
+    const response = await axios.post('http://localhost:5000/api/auth/setnewpassword', formData)
+    console.log(response.data.payload);
+    
+    return response.data
+  }
 )
 
 export const sendOtp = createAsyncThunk(
-  '/api/hadlesendotp', async(formData)=>{
-      const response = await axios.post('http://localhost:5000/api/auth/forgotpassword',formData)
-      console.log(response.data);
-      return response.data
+  '/api/hadlesendotp', 
+  async (formData) => {
+    const response = await axios.post('http://localhost:5000/api/auth/forgotpassword', formData)
+    console.log(response.data);
+    return response.data
   }
 )
+
 export const verifyOtp = createAsyncThunk(
-  '/verify/otp', async(formData)=>
-  {
-      const response = await axios.post('http://localhost:5000/api/auth/forgotpassword',formData)
-      console.log(response.data);
-      return response.data
-      
+  '/verify/otp', 
+  async (formData) => {
+    const response = await axios.post('http://localhost:5000/api/auth/forgotpassword', formData)
+    console.log(response.data);
+    return response.data
   }
 ) 
 
@@ -120,14 +127,14 @@ const authSlice = createSlice({
         state.user = null;
         state.isLoading = false;
       })
-    .addCase(login.fulfilled, (state, action) => {
+      .addCase(login.fulfilled, (state, action) => {
         console.log(action);
 
         state.isLoading = false;
         state.user = action.payload.success ? action.payload.user : null;
         state.isAuthenticated = action.payload.success;
       })
-    .addCase(checkAuthUser.pending, (state) => {
+      .addCase(checkAuthUser.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(checkAuthUser.fulfilled, (state, action) => {
@@ -148,6 +155,5 @@ const authSlice = createSlice({
   },
 });
 
-
 export const { logout } = authSlice.actions;
-export default authSlice.reducer;    
+export default authSlice.reducer;

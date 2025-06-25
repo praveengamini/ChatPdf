@@ -25,7 +25,6 @@ const App = () => {
     <div>
       <CheckAuth isAuthenticated={isAuthenticated} />
       <Routes>
-        {/* Auth routes with shared layout */}
         <Route path="/auth" element={<AuthOutlet />}>
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
@@ -33,12 +32,10 @@ const App = () => {
           <Route path="setpassword" element={<SetPassword />} />
         </Route>
         
-        {/* Chat routes */}
         <Route path="/chat">
           <Route path="home" element={<Home />} />
         </Route>
         
-        {/* 404 page */}
         <Route path="*" element={<NotFound />} />
       </Routes>
       
