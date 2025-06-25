@@ -122,8 +122,8 @@ JWT_SECRET_KEY=your_super_secret_jwt_key_here
 FROM_OTP_SENDING_MAIL=your-email@gmail.com
 OTP_MAIL_PASS=your_app_password_here
 
-# Optional: OpenAI API Key (if using OpenAI models)
-OPENAI_API_KEY=your_openai_key_here
+# Ip address of python micro service eg:http://172.16.30.113:8000
+IP_PY_MICRO=ip_address_where_Python_microservice_running 
 ```
 
 ### 3. Install Dependencies
