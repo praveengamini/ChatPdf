@@ -10,7 +10,7 @@ const cookieParser = require('cookie-parser')
 const morgan = require('morgan')
 
 const corsOptions = {
-  origin: 'http://localhost:5173',  
+  origin: 'https://chatpdf-frontend.onrender.com',  
   credentials: true,               
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: [
