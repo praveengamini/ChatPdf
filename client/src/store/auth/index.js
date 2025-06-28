@@ -10,7 +10,7 @@ const initialData = {
 export const register = createAsyncThunk(
   '/auth/register',
   async (formData) => {
-    const response = await axios.post("http://localhost:5000/api/auth/register", formData, {
+    const response = await axios.post("https://chatpdf-backend-5fv2.onrender.com/api/auth/register", formData, {
       withCredentials: true
     })
     
@@ -22,7 +22,7 @@ export const login = createAsyncThunk(
   '/auth/login',
   async (formData) => {
     const response = await axios.post(
-      "http://localhost:5000/api/auth/login",
+      "https://chatpdf-backend-5fv2.onrender.com/api/auth/login",
       formData,
       {
         withCredentials: true,
@@ -36,7 +36,7 @@ export const logoutUser = createAsyncThunk(
   "/auth/logout",
   async (_, { dispatch }) => {
     const response = await axios.post(
-      "http://localhost:5000/api/auth/logout", 
+      "https://chatpdf-backend-5fv2.onrender.com/api/auth/logout", 
       {},
       { withCredentials: true }
     );
@@ -52,7 +52,7 @@ export const checkAuthUser = createAsyncThunk(
   "/auth/checkauth",
   async () => {
     const response = await axios.get(
-      "http://localhost:5000/api/auth/check-auth",
+      "https://chatpdf-backend-5fv2.onrender.com/api/auth/check-auth",
       {
         withCredentials: true,
         headers: {
@@ -69,7 +69,7 @@ export const checkAuthUser = createAsyncThunk(
 export const changePassword = createAsyncThunk(
   '/auth/changePassword',
   async (formData) => {
-    const response = await axios.post('http://localhost:5000/api/auth/setnewpassword', formData)
+    const response = await axios.post('https://chatpdf-backend-5fv2.onrender.com/api/auth/setnewpassword', formData)
     console.log(response.data.payload);
     
     return response.data
@@ -79,7 +79,7 @@ export const changePassword = createAsyncThunk(
 export const sendOtp = createAsyncThunk(
   '/api/hadlesendotp', 
   async (formData) => {
-    const response = await axios.post('http://localhost:5000/api/auth/forgotpassword', formData)
+    const response = await axios.post('https://chatpdf-backend-5fv2.onrender.com/api/auth/forgotpassword', formData)
     console.log(response.data);
     return response.data
   }
@@ -88,7 +88,7 @@ export const sendOtp = createAsyncThunk(
 export const verifyOtp = createAsyncThunk(
   '/verify/otp', 
   async (formData) => {
-    const response = await axios.post('http://localhost:5000/api/auth/forgotpassword', formData)
+    const response = await axios.post('https://chatpdf-backend-5fv2.onrender.com/api/auth/forgotpassword', formData)
     console.log(response.data);
     return response.data
   }

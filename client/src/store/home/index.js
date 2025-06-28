@@ -9,7 +9,7 @@ export const uploadPdf = createAsyncThunk(
       formData.append('file', file)
       formData.append('userId', userId)
 
-      const res = await axios.post('http://localhost:5000/api/pdf/upload', formData, {
+      const res = await axios.post('https://chatpdf-backend-5fv2.onrender.com/api/pdf/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
 
@@ -23,7 +23,7 @@ export const sendMessageToChat = createAsyncThunk(
   'pdfChat/sendMessageToChat',
   async ({ pdfId, userId, message }, thunkAPI) => {
     try {
-      const res = await axios.post(`http://localhost:5000/api/chat/send/${pdfId}/${userId}`, {
+      const res = await axios.post(`https://chatpdf-backend-5fv2.onrender.com/api/chat/send/${pdfId}/${userId}`, {
         sender: 'user',
         message,
       })
@@ -38,7 +38,7 @@ export const getUserPdfs = createAsyncThunk(
   'pdfChat/getUserPdfs',
   async (userId, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/pdf/user/${userId}`);
+      const response = await axios.get(`https://chatpdf-backend-5fv2.onrender.com/api/pdf/user/${userId}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch PDFs');
@@ -49,7 +49,7 @@ export const deletePdf = createAsyncThunk(
   'pdfChat/deletePdf',
   async (pdfId, { rejectWithValue }) => {
     try {
-      const response = await axios.delete(`http://localhost:5000/api/pdf/deletePdf/${pdfId}/`);
+      const response = await axios.delete(`https://chatpdf-backend-5fv2.onrender.com/api/pdf/deletePdf/${pdfId}/`);
       return { pdfId, ...response.data };
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to delete PDF');
@@ -60,7 +60,7 @@ export const getChatByPdf = createAsyncThunk(
   'pdfChat/getChatByPdf',
   async (pdfId, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/chat/getchat/${pdfId}`);
+      const response = await axios.get(`https://chatpdf-backend-5fv2.onrender.com/api/chat/getchat/${pdfId}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch chat');
