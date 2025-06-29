@@ -10,7 +10,7 @@ const initialData = {
 export const register = createAsyncThunk(
   '/auth/register',
   async (formData) => {
-    const response = await axios.post("https://chatpdf-backend-5fv2.onrender.com/api/auth/register", formData, {
+    const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/register`, formData, {
       withCredentials: true
     })
     
@@ -22,7 +22,7 @@ export const login = createAsyncThunk(
   '/auth/login',
   async (formData) => {
     const response = await axios.post(
-      "https://chatpdf-backend-5fv2.onrender.com/api/auth/login",
+      `${import.meta.env.VITE_BACKEND_URL}/api/auth/login`,
       formData,
       {
         withCredentials: true,
@@ -36,12 +36,11 @@ export const logoutUser = createAsyncThunk(
   "/auth/logout",
   async (_, { dispatch }) => {
     const response = await axios.post(
-      "https://chatpdf-backend-5fv2.onrender.com/api/auth/logout", 
+      `${import.meta.env.VITE_BACKEND_URL}/api/auth/logout`, 
       {},
       { withCredentials: true }
     );
     
-    // Clear PDF chat data on logout
     dispatch({ type: 'pdfChat/resetPdfChat' });
     
     return response.data;
@@ -52,7 +51,7 @@ export const checkAuthUser = createAsyncThunk(
   "/auth/checkauth",
   async () => {
     const response = await axios.get(
-      "https://chatpdf-backend-5fv2.onrender.com/api/auth/check-auth",
+      `${import.meta.env.VITE_BACKEND_URL}/api/auth/check-auth`,
       {
         withCredentials: true,
         headers: {
@@ -69,7 +68,7 @@ export const checkAuthUser = createAsyncThunk(
 export const changePassword = createAsyncThunk(
   '/auth/changePassword',
   async (formData) => {
-    const response = await axios.post('https://chatpdf-backend-5fv2.onrender.com/api/auth/setnewpassword', formData)
+    const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/setnewpassword`, formData)
     console.log(response.data.payload);
     
     return response.data
@@ -79,7 +78,7 @@ export const changePassword = createAsyncThunk(
 export const sendOtp = createAsyncThunk(
   '/api/hadlesendotp', 
   async (formData) => {
-    const response = await axios.post('https://chatpdf-backend-5fv2.onrender.com/api/auth/forgotpassword', formData)
+    const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/forgotpassword`, formData)
     console.log(response.data);
     return response.data
   }
@@ -88,12 +87,24 @@ export const sendOtp = createAsyncThunk(
 export const verifyOtp = createAsyncThunk(
   '/verify/otp', 
   async (formData) => {
-    const response = await axios.post('https://chatpdf-backend-5fv2.onrender.com/api/auth/forgotpassword', formData)
+    const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/forgotpassword`, formData)
     console.log(response.data);
     return response.data
   }
 ) 
-
+export const googleLogin = createAsyncThunk(
+  'auth/googleLogin',
+  async (userData, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/google-login`, userData, {
+        withCredentials: true
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || { message: 'Google login failed' });
+    }
+  }
+);
 const authSlice = createSlice({
   name: "auth",
   initialState: initialData,
@@ -151,6 +162,20 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;
+      }) .addCase(googleLogin.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(googleLogin.fulfilled, (state, action) => {
+        state.isLoading = false;
+        if (action.payload.success) {
+          state.isAuthenticated = true;
+          state.user = action.payload.user;
+        }
+      })
+      .addCase(googleLogin.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload?.message || 'Google login failed';
       });
   },
 });

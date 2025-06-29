@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -13,10 +14,29 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    otp:{
-        type:Number,
-        otpExpiresAt: Date
+    profilePicture: {
+        type: String,
+        default: null
+    },
+    firebaseUid: {
+        type: String,
+        default: null
+    },
+    authProvider: {
+        type: String,
+        enum: ['email', 'google'],
+        default: 'email'
+    },
+    otp: {
+        type: Number,
+        default: null
+    },
+    otpExpiresAt: {
+        type: Date,
+        default: null
     }
+}, {
+    timestamps: true
 });
 
 const User = mongoose.model('User', userSchema);

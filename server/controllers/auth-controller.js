@@ -1,6 +1,27 @@
 const User = require('../models/User')
 const jwt = require("jsonwebtoken");
 const nodemailer = require('nodemailer')
+const admin = require('firebase-admin');
+require("dotenv").config(); 
+
+
+admin.initializeApp({
+  credential: admin.credential.cert({
+    type: process.env.FIREBASE_TYPE,
+    project_id: process.env.FIREBASE_PROJECT_ID,
+    private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
+    private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+    client_email: process.env.FIREBASE_CLIENT_EMAIL,
+    client_id: process.env.FIREBASE_CLIENT_ID,
+    auth_uri: process.env.FIREBASE_AUTH_URI,
+    token_uri: process.env.FIREBASE_TOKEN_URI,
+    auth_provider_x509_cert_url: process.env.FIREBASE_AUTH_PROVIDER_CERT_URL,
+    client_x509_cert_url: process.env.FIREBASE_CLIENT_CERT_URL,
+    universe_domain: process.env.FIREBASE_UNIVERSE_DOMAIN,
+  }),
+});
+
+
 const registerUser = async(req,res)=>{
     const {userName,email,password} = req.body;
     
@@ -32,6 +53,78 @@ const registerUser = async(req,res)=>{
         })
     }
 }
+const googleLogin = async (req, res) => {
+    const { idToken, email, name, photoURL, uid } = req.body;
+
+    try {
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        
+        if (decodedToken.uid !== uid) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid token"
+            });
+        }
+
+        let user = await User.findOne({ email });
+
+        if (!user) {
+            user = new User({
+                name: name,
+                email: email,
+                password: 'GOOGLE_AUTH',
+                firebaseUid: uid,
+                profilePicture: photoURL,
+                authProvider: 'google'
+            });
+            await user.save();
+        } else {
+            if (!user.firebaseUid) {
+                user.firebaseUid = uid;
+                user.authProvider = 'google';
+                if (photoURL && !user.profilePicture) {
+                    user.profilePicture = photoURL;
+                }
+                await user.save();
+            }
+        }
+
+        const token = jwt.sign(
+            {
+                id: user._id,
+                email: user.email,
+                userName: user.name,
+                firebaseUid: uid
+            },
+            process.env.JWT_SECRET_KEY,
+            { expiresIn: "60m" }
+        );
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'None'
+        }).json({
+            success: true,
+            message: "Logged in successfully with Google",
+            user: {
+                id: user._id,
+                email: user.email,
+                userName: user.name,
+                profilePicture: user.profilePicture,
+                authProvider: user.authProvider
+            },
+        });
+
+    } catch (error) {
+        console.error('Google login error:', error);
+        res.status(500).json({
+            success: false,
+            message: "Google authentication failed"
+        });
+    }
+};
+
 
 const loginUser = async(req,res)=>{
      const {userName,email,password} = req.body;
@@ -231,4 +324,4 @@ const setnewpassword = async(req,res)=>{
   }
 }
 
-module.exports = {registerUser,loginUser,logoutUser,authMiddleware,setnewpassword,forgotPassword}
+module.exports = {registerUser,loginUser,logoutUser,authMiddleware,setnewpassword,forgotPassword,googleLogin}

@@ -4,7 +4,7 @@ const multer = require('multer');
 const { uploadPdf,getUserPdfs,deletePdf } = require('../controllers/pdf-controller.js');
 
 const router = express.Router();
-const upload = multer({ dest: 'uploads/' }); // Store locally or use S3
+const upload = multer({ dest: 'uploads/' });
 
 router.post('/upload', upload.single('file'), uploadPdf);
 router.get('/user/:userId', getUserPdfs);

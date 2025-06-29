@@ -4,7 +4,7 @@ const {
   loginUser,
   logoutUser,
   authMiddleware,
-  setnewpassword,forgotPassword
+  setnewpassword,forgotPassword,googleLogin
 } = require("../controllers/auth-controller");
 const router = express.Router()
 router.post("/register", registerUser);
@@ -20,4 +20,5 @@ router.get("/check-auth", authMiddleware, (req, res) => {
 });
 router.post("/forgotpassword",forgotPassword)
 router.post('/setnewpassword', setnewpassword);
+router.post('/google-login', googleLogin); 
 module.exports = router

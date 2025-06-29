@@ -9,8 +9,10 @@ const dotenv = require('dotenv')
 const cookieParser = require('cookie-parser')
 const morgan = require('morgan')
 
+dotenv.config()
+
 const corsOptions = {
-  origin: 'https://chatpdf-frontend.onrender.com',  
+  origin: process.env.CORS_ORIGIN,  
   credentials: true,               
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: [
@@ -23,7 +25,6 @@ const corsOptions = {
   ],
 };
 
-dotenv.config()
 app.use(express.json())
 app.use(cors(corsOptions))
 app.use(cookieParser());

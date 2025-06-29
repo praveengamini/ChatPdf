@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Label } from '../../components/ui/label'
 import { Input } from '../../components/ui/input'
 import { useNavigate } from 'react-router-dom'
-import { FaUser, FaEnvelope, FaLock, FaArrowRight, FaEye, FaEyeSlash } from 'react-icons/fa'
+import { FaUser, FaEnvelope, FaLock, FaArrowRight, FaEye, FaEyeSlash, FaSpinner } from 'react-icons/fa'
 import { useDispatch } from 'react-redux';
 import { toast } from 'sonner';
 import { register } from '../../store/auth'
@@ -14,15 +14,19 @@ const Register = () => {
     const [password, setPassword] = useState("")
     const [name, setName] = useState("")
     const [showPassword, setShowPassword] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
     const dispatch = useDispatch()
 
    async function handleRegister(event) {
-        const formData = {
-        email: email,
-        password: password,
-        userName:name,
-        };
         event.preventDefault();
+        setIsLoading(true)
+        
+        const formData = {
+            email: email,
+            password: password,
+            userName: name,
+        };
+        
         try {
             const data = await dispatch(register(formData));
             console.log(data);
@@ -31,14 +35,15 @@ const Register = () => {
             console.log(payload);
             
             if (payload?.success) {
-            toast(payload.message);  
-            navigate('/auth/login');
+                toast.success(payload.message);  
+                navigate('/auth/login');
             } else {
-            toast.error(payload?.message || "An error occurred during registration");
+                toast.error(payload?.message || "An error occurred during registration");
             }
-        }catch (error) 
-        {
-             toast.error("An unexpected error occurred");
+        } catch (error) {
+            toast.error("An unexpected error occurred");
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -67,6 +72,7 @@ const Register = () => {
                             className="bg-white/3 backdrop-blur-xl border-white/40 text-white placeholder:text-white/60 focus:ring-2 focus:ring-white/60 focus:border-white/60 backdrop-saturate-150"
                             placeholder="Enter your username"
                             required
+                            disabled={isLoading}
                         />
                     </div>
 
@@ -82,6 +88,7 @@ const Register = () => {
                             className="bg-white/3 backdrop-blur-xl border-white/40 text-white placeholder:text-white/60 focus:ring-2 focus:ring-white/60 focus:border-white/60 backdrop-saturate-150"
                             placeholder="your@email.com"
                             required
+                            disabled={isLoading}
                         />
                     </div>
 
@@ -98,11 +105,13 @@ const Register = () => {
                                 className="bg-white/3 backdrop-blur-xl border-white/40 text-white placeholder:text-white/60 focus:ring-2 focus:ring-white/60 focus:border-white/60 backdrop-saturate-150 pr-12"
                                 placeholder="enter your password"
                                 required
+                                disabled={isLoading}
                             />
                             <button
                                 type="button"
                                 onClick={togglePasswordVisibility}
                                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/70 hover:text-white transition-colors focus:outline-none"
+                                disabled={isLoading}
                             >
                                 {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
                             </button>
@@ -111,9 +120,20 @@ const Register = () => {
 
                     <button
                         type="submit"
-                        className="w-full bg-white/10 backdrop-blur-2xl hover:bg-white/20 text-white py-3 px-4 rounded-lg font-medium flex items-center justify-center gap-2 transition-all duration-300 border border-white/50 hover:border-white/70 backdrop-saturate-150"
+                        disabled={isLoading}
+                        className="w-full bg-white/10 backdrop-blur-2xl hover:bg-white/20 text-white py-3 px-4 rounded-lg font-medium flex items-center justify-center gap-2 transition-all duration-300 border border-white/50 hover:border-white/70 backdrop-saturate-150 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        Register <FaArrowRight />
+                        {isLoading ? (
+                            <>
+                                <FaSpinner className="animate-spin" />
+                                <span>Creating Account...</span>
+                            </>
+                        ) : (
+                            <>
+                                <span>Register</span>
+                                <FaArrowRight />
+                            </>
+                        )}
                     </button>
                 </form>
 
