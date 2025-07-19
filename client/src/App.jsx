@@ -14,12 +14,20 @@ import { checkAuthUser } from './store/auth';
 import { useDispatch } from 'react-redux';
 
 const App = () => {
-  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
-  const dispatch = useDispatch()
-  
-  useEffect(()=>{
-    dispatch(checkAuthUser())
-  },[dispatch])
+   const {isAuthenticated, isLoading } = useSelector((state)=>state.auth)
+   const dispatch = useDispatch()
+   
+   useEffect(()=>{
+     dispatch(checkAuthUser())
+    },[dispatch])
+    
+    if (isLoading) {
+      return (
+        <div className="h-screen flex items-center justify-center text-lg">
+          Checking authentication...
+        </div>
+      );
+    }
   
   return (
     <div>
