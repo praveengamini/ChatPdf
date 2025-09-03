@@ -38,31 +38,34 @@ app.add_middleware(
 chroma_client = chromadb.PersistentClient(path="./chroma_db")
 
 
-class LocalMistralChatLLM(LLM):
-    model_name: str = "llama3-8b-8192"
-    groq_api_key: str = os.getenv("GROQ_API_KEY")
+class GeminiChatLLM(LLM):
+    model_name: str = "gemini-2.5-flash"
+    api_key: str = os.getenv("GEMINI_API_KEY")
 
     @property
     def _llm_type(self) -> str:
-        return "local_mistral_chat_llm"
+        return "gemini_chat_llm"
 
     def _call(self, prompt: str, stop: Optional[List[str]] = None) -> str:
-        url = "https://api.groq.com/openai/v1/chat/completions"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model_name}:generateContent"
         headers = {
-            "Authorization": f"Bearer {self.groq_api_key}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "X-goog-api-key": self.api_key
         }
         payload = {
-            "model": self.model_name,
-            "messages": [{"role": "user", "content": prompt}],
-            "temperature": 0.7,
-            "max_tokens": 1024
+            "contents": [
+                {
+                    "parts": [
+                        {"text": prompt}
+                    ]
+                }
+            ]
         }
         response = requests.post(url, headers=headers, json=payload)
         if not response.ok:
-            print("Groq API error:", response.text)
+            print("Gemini API error:", response.text)
             response.raise_for_status()
-        return response.json()["choices"][0]["message"]["content"]
+        return response.json()["candidates"][0]["content"]["parts"][0]["text"]
 
 class ChromaDBChatMemory:
     def __init__(self, pdf_id: str, session_id: str, k: int = 5):
