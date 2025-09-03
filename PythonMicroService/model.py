@@ -38,7 +38,7 @@ app.add_middleware(
 chroma_client = chromadb.PersistentClient(path="./chroma_db")
 
 
-class LocalMistralChatLLM(LLM, BaseModel):
+class LocalMistralChatLLM(LLM):
     model_name: str = "llama3-8b-8192"
     groq_api_key: str = os.getenv("GROQ_API_KEY")
 
