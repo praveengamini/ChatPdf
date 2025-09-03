@@ -182,7 +182,7 @@ def generate_answer(request: GenerateRequest):
                 k=5
             )
         memory = memory_instances[session_key]
-        mistral_llm = LocalMistralChatLLM()
+        gemini_llm = GeminiChatLLM()
         chat_history = memory.get_recent_messages()
         retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
         relevant_docs = retriever.get_relevant_documents(request.message)
@@ -202,7 +202,7 @@ Previous conversation:
 Current question: {request.message}
 
 Please answer the question based on the provided context and conversation history. If the answer cannot be found in the context, say so clearly."""
-        answer = mistral_llm._call(enhanced_prompt)
+        answer = answer = gemini_llm._call(enhanced_prompt)
         memory.add_message(HumanMessage(content=request.message))
         memory.add_message(AIMessage(content=answer))
         return {
