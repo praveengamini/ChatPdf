@@ -59,7 +59,8 @@ ChatPDF/
 └── 📁 PythonMicroService/       # AI/ML Microservice
     ├── model.py               # FastAPI application
     ├── requirements.txt       # Python dependencies
-    └── chroma_db/          # ChromDb vector storage
+    ├── chroma_db/          # ChromDb vector storage
+    └── .env               # Python service environment variables
 ```
 
 ## 🛠️ Tech Stack
@@ -84,8 +85,8 @@ ChatPDF/
 ### AI/ML Microservice
 - **🚀 FastAPI** - High-performance Python web framework
 - **🦜 LangChain** - LLM application framework
-- **🤗 HuggingFace Transformers** - State-of-the-art NLP models
-- **🔍 FAISS** - Efficient similarity search
+- **🤖 Google Gemini AI** - Advanced language model for document analysis
+- **🔍 FAISS/ChromaDB** - Efficient similarity search and vector storage
 - **📊 Sentence Transformers** - Semantic text embeddings
 - **✅ Pydantic** - Data validation and serialization
 
@@ -96,6 +97,7 @@ ChatPDF/
 - **Node.js** (v16 or higher)
 - **Python** (v3.8 or higher)
 - **MongoDB** (local or cloud instance)
+- **Google AI API Key** (for Gemini integration)
 - **Git**
 
 ### 1. Clone the Repository
@@ -106,6 +108,8 @@ cd ChatPDF
 ```
 
 ### 2. Environment Setup
+
+#### Backend Server (.env in `server/` directory)
 
 Create a `.env` file in the `server/` directory:
 
@@ -122,11 +126,44 @@ JWT_SECRET_KEY=your_super_secret_jwt_key_here
 FROM_OTP_SENDING_MAIL=your-email@gmail.com
 OTP_MAIL_PASS=your_app_password_here
 
-# Ip address of python micro service eg:http://172.16.30.113:8000
-IP_PY_MICRO=ip_address_where_Python_microservice_running 
+# Python Microservice URL
+IP_PY_MICRO=http://localhost:8000
+# For remote deployment: IP_PY_MICRO=http://your-server-ip:8000
 ```
 
-### 3. Install Dependencies
+#### Python Microservice (.env in `PythonMicroService/` directory)
+
+Create a `.env` file in the `PythonMicroService/` directory:
+
+```env
+# Server Configuration
+PORT=8000
+
+# Google AI Configuration
+GEMINI_API_KEY=your_google_gemini_api_key_here
+
+# Optional: Additional AI Service Configuration
+# OPENAI_API_KEY=your_openai_key_here
+# HUGGINGFACE_API_TOKEN=your_hf_token_here
+```
+
+### 3. Get Your API Keys
+
+#### Google Gemini API Key
+1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Sign in with your Google account
+3. Create a new API key
+4. Copy the API key and add it to your `.env` file
+
+#### Email Configuration (for OTP)
+1. Enable 2-Factor Authentication on your Gmail account
+2. Generate an App Password:
+   - Go to Google Account settings
+   - Security → 2-Step Verification → App passwords
+   - Generate password for "Mail"
+   - Use this password in `OTP_MAIL_PASS`
+
+### 4. Install Dependencies
 
 #### Frontend
 ```bash
@@ -146,7 +183,7 @@ cd ../PythonMicroService
 pip install -r requirements.txt
 ```
 
-### 4. Start the Application
+### 5. Start the Application
 
 Open **three terminal windows** and run:
 
@@ -177,7 +214,7 @@ python -m uvicorn model:app --host 0.0.0.0 --port 8000 --reload
 1. **Sign Up/Login** - Create an account or log in with existing credentials
 2. **Upload PDF** - Click the upload button and select your PDF document
 3. **Start Chatting** - Ask questions about your document in natural language
-4. **Get Answers** - Receive contextual answers based on your PDF content
+4. **Get Answers** - Receive contextual answers based on your PDF content powered by Google Gemini AI
 
 ### Example Queries
 
@@ -185,23 +222,78 @@ python -m uvicorn model:app --host 0.0.0.0 --port 8000 --reload
 - "Summarize the key findings in chapter 3"
 - "What are the conclusions mentioned in the research?"
 - "Find all mentions of 'artificial intelligence'"
+- "Compare the data in tables 1 and 2"
+- "Extract all the important dates mentioned"
 
+## 🔧 Configuration Notes
+
+### Environment Variables Explanation
+
+#### Server Environment
+- `MONGO_URL`: Your MongoDB connection string
+- `JWT_SECRET_KEY`: Secret key for JWT token generation (use a strong, random string)
+- `FROM_OTP_SENDING_MAIL`: Gmail address for sending OTP emails
+- `OTP_MAIL_PASS`: Gmail App Password (not your regular password)
+- `IP_PY_MICRO`: URL where Python microservice is running
+
+#### Python Microservice Environment
+- `PORT`: Port for the FastAPI service (default: 8000)
+- `GEMINI_API_KEY`: Your Google Gemini AI API key for document processing and chat
+
+### Security Best Practices
+
+1. **Never commit `.env` files** to version control
+2. **Use strong JWT secrets** (at least 32 characters)
+3. **Rotate API keys** regularly
+4. **Use App Passwords** for Gmail, not your account password
+5. **Set proper CORS origins** in production
+
+
+## 🚨 Troubleshooting
+
+### Common Issues
+
+1. **MongoDB Connection Error**
+   - Ensure MongoDB is running
+   - Check connection string format
+   - Verify network access for MongoDB Atlas
+
+2. **Python Service Not Starting**
+   - Check if port 8000 is available
+   - Verify Python dependencies are installed
+   - Ensure GEMINI_API_KEY is valid
+
+3. **OTP Email Not Sending**
+   - Verify Gmail App Password
+   - Check if 2FA is enabled
+   - Ensure "Less secure app access" is disabled (use App Password instead)
+
+4. **PDF Processing Errors**
+   - Check file size limits
+   - Verify PDF is not password protected
+   - Ensure sufficient disk space for ChromaDB
 
 ## 🤝 Contributing
 
-Welcoming contributions! 
-
+Welcoming contributions! Please check out our contributing guidelines and feel free to submit issues or pull requests.
 
 ## 📞 Support
 
 If you encounter any issues or have questions:
 
 - 📧 **Email**: praveengamini009@gmail.com
+- 🐛 **Issues**: [GitHub Issues](https://github.com/praveengamini/ChatPDF/issues)
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
 <div align="center">
 
 **⭐ Star this repo if you find it helpful!**
+
+Built with ❤️ using React, Node.js, FastAPI, and Google Gemini AI
 
 </div>
