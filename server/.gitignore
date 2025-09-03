@@ -10,3 +10,5 @@ node_modules/
 # optional: build outputs
 dist/
 build/
+
+uploads
