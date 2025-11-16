@@ -1,15 +1,17 @@
 import uvicorn
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+
+# LangChain new imports
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
-from langchain.chains import RetrievalQA
-from langchain.llms.base import LLM
-from langchain.memory import ConversationBufferWindowMemory
-from langchain.chains import ConversationalRetrievalChain
-from langchain.schema import BaseMessage, HumanMessage, AIMessage
-from typing import Optional, List, Mapping, Any
+from langchain_core.language_models import LLM
+from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
+
+# Other dependencies
+from typing import Optional, List
 import requests
 import chromadb
 from chromadb.config import Settings
@@ -18,7 +20,8 @@ import uuid
 from datetime import datetime
 from dotenv import load_dotenv
 import os
-from fastapi.middleware.cors import CORSMiddleware
+
+
 
 
 load_dotenv()
@@ -39,7 +42,7 @@ chroma_client = chromadb.PersistentClient(path="./chroma_db")
 
 
 class GeminiChatLLM(LLM):
-    model_name: str = "gemini-2.5-flash"
+    model_name: str = "gemini-flash-latest"
     api_key: str = os.getenv("GEMINI_API_KEY")
 
     @property
@@ -185,7 +188,7 @@ def generate_answer(request: GenerateRequest):
         gemini_llm = GeminiChatLLM()
         chat_history = memory.get_recent_messages()
         retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
-        relevant_docs = retriever.get_relevant_documents(request.message)
+        relevant_docs = retriever.invoke(request.message)
         context = "\n\n".join([doc.page_content for doc in relevant_docs])
         history_string = ""
         for msg in chat_history:
@@ -212,7 +215,11 @@ Please answer the question based on the provided context and conversation histor
             "message_count": memory.get_message_count()
         }
     except Exception as e:
+        print("🔥 ERROR DURING GENERATION:", type(e).__name__, str(e))
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Error generating answer: {str(e)}")
+
 
 @app.get("/health")
 def health_check():
